@@ -28,7 +28,7 @@ const io = require("socket.io")(server, {
 
 // APP use
 app.use(cors({
-    origin: 'https://front-seven-ruddy.vercel.app/', 
+    origin: 'https://front-seven-ruddy.vercel.app', 
     methods: ["GET", "POST"],        
     credentials: true                
 }));
