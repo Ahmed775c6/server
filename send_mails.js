@@ -97,4 +97,38 @@ async function ReplayToContact(mail){
     return err;
   }
   }
-module.exports = {SendVerifCode, SendBookigNotificationMail,ReplayToContact};
+async function SendAbonnement(array) {
+  try{
+    const mailOptions = {
+      from: 'All Tunsia Para',
+  
+      to: array.email,
+      subject: 'new post added',
+      text: ``,
+      html: 
+
+`
+      <p>
+        <b>To:</b> ${array.name} <br />
+        <b>subject:</b> ${array.message} <br />
+    <a href="https://alltunisiapara.com/${array.link}" target="_blank">${array.link}</a>
+
+      </p>`
+    };
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending verification email:', error);
+        return false;
+      } else {
+        console.log('Notifications mails sent :', info.response);
+        return true;
+      }
+    })
+  
+  }catch(err){
+    console.log('error sending book notification by mail ',err)
+    return err;
+  }
+  
+}
+module.exports = {SendVerifCode, SendBookigNotificationMail,ReplayToContact, SendAbonnement};
