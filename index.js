@@ -55,7 +55,7 @@ const BLOGS_COLLECTION = process.env.BLOGS_COLLECTION
 const Reviews_Collection = process.env.Reviews_Collection
 const EXPENESS_COLLECTION = process.env.EXPENESS_COLLECTION
 const BRANDS = process.env.BRANDS;
-const uri  = process.env.MONGO_URIPRO;
+const uri  = process.env.MONGO_URI;
 
 /*const { ServerApiVersion } = require('mongodb');
 const uri = "mongodb+srv://ahmedchouikh2020:0oA8H5yrwmpgu4xw@cluster0.ybgdh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
@@ -974,7 +974,17 @@ res.json({message : r})
     res.json({message : []})
   }
 })
+app.get('/legals101',async(req,res)=>{
+  try{
 
+    const i =await db.collection(APPCOLLECTION).findOne({id : "setup"});
+  
+    res.json({message : true , dt : [{g : i.Gratuit , p : i.merci }]})
+  }catch(err){
+    console.log(err)
+    res.json({message : false , dt : [{g : 'X' , p : '0'}]})
+  }
+})
 
 app.get('/Analyse',async(req,res)=>{
   try{
