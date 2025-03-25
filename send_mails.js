@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
   });
  async function SendVerifCode(mail,Name,verificationCode,verificationLink){
     try{
-
+console.log(verificationLink)
         const mailOptions = {
             from: 'All Tunsia Para',
             to: mail,
