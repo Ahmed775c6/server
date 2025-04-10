@@ -1205,8 +1205,10 @@ app.get('/ProductsPl2014', async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || ITEMS_PER_PAGE;
-    const id = req.query.id?.trim() || ""; // Trim whitespace
-console.log('id : ', id)
+    let id = req.query.id?.trim() || ""; // Trim whitespace
+if(id == 'cheveux'){
+  id = "cheveu"
+}
     // Build MongoDB filter
     const filter = id ? {
       $or: [
