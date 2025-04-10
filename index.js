@@ -1203,24 +1203,37 @@ app.get('/ProductsPl2', async (req, res) => {
 app.get('/ProductsPl2014', async (req, res) => {
   const ITEMS_PER_PAGE = 100;
   try {
-    console.log(req.query)
-    const page = parseInt(req.query.page) || 1; //
+    const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || ITEMS_PER_PAGE;
-    const id = req.query.id || ""; // 
+    const id = req.query.id?.trim() || ""; // Trim whitespace
+console.log('id : ', id)
+    // Build MongoDB filter
+    const filter = id ? {
+      $or: [
+        { Categorie: { $regex: `^${id}$`, $options: 'i' } },
+        { sous: { $regex: `^${id}$`, $options: 'i' } },
+        { marques: { $regex: `^${id}$`, $options: 'i' } }
+      ]
+    } : {};
+
     const skip = (page - 1) * limit;
 
-    // Fetch data with pagination
-    const data = await db.collection(PRODUCTS_COLLECTION).find().skip(skip).limit(limit).toArray();
-const r = data.filter((item)=> {return item.Categorie.toLocaleLowerCase() == id.toLocaleLowerCase() || item.sous.toLocaleLowerCase() == id.toLocaleLowerCase() || item.marques.toLocaleLowerCase() == id.toLocaleLowerCase() 
-} )
-    // Get the total number of products for pagination calculation
-    const totalProducts = await db.collection(PRODUCTS_COLLECTION).countDocuments();
-console.log(data)
+    // Fetch filtered data
+    const data = await db.collection(PRODUCTS_COLLECTION)
+      .find(filter)
+      .skip(skip)
+      .limit(limit)
+      .toArray();
+
+    // Get total filtered documents
+    const totalFiltered = await db.collection(PRODUCTS_COLLECTION)
+      .countDocuments(filter);
+
     res.json({
-      data : r,
-      totalProducts,
+      data,
+      totalProducts: totalFiltered,
       currentPage: page,
-      totalPages: Math.ceil(totalProducts / limit),
+      totalPages: Math.ceil(totalFiltered / limit),
     });
   } catch (err) {
     console.error(err);
