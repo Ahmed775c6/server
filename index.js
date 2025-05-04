@@ -2385,7 +2385,7 @@ nls = Target.utiliste * Target.merci;
 
   const Invoke = {
     status : "pending",
-    invoiceNo : l.length + 1 ,
+    invoiceNo : l.length ? l.length + 1 : 1 ,
     invoicedTo : [Target.name_req, Target.address,Target.tel ],
     payTo : ['AllParamarmacie', "AllParapharmcie.com"],
   items :Y,
