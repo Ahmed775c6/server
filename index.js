@@ -21,16 +21,24 @@ const { subscribe } = require('diagnostics_channel');
 const FRONT = process.env.FRONT_END_URL
 
 const io = require("socket.io")(server, {
-    cors: {
-    
-        origin: FRONT || 'https://alltunisiapara.com',
-        secure : process.env.NODE_ENV == "production"
-    },
+  cors: {
+      origin: [
+          process.env.FRONT, 
+          'https://alltunisiapara.com',
+          'https://www.alltunisiapara.com'
+      ].filter(Boolean), // Removes any undefined/null values
+      credentials: true,
+      methods: ["GET", "POST"]
+  }
 });
 
 // APP use
 app.use(cors({
-    origin: FRONT, 
+    origin:  [
+      process.env.FRONT, 
+      'https://alltunisiapara.com',
+      'https://www.alltunisiapara.com'
+  ].filter(Boolean), 
     methods: ["GET", "POST"],        
     credentials: true         ,
     secure : process.env.NODE_ENV == "production"       
