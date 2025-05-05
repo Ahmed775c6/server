@@ -23,7 +23,7 @@ const FRONT = process.env.FRONT_END_URL
 const io = require("socket.io")(server, {
     cors: {
     
-        origin: FRONT,
+        origin: FRONT || 'https://alltunisiapara.com',
         secure : process.env.NODE_ENV == "production"
     },
 });
@@ -87,9 +87,7 @@ async function run() {
 //run().catch(console.dir);
 const client = new MongoClient(uri);
 let db =client.db(dbName);
-app.get('/',(req,res)=>{
-  res.json({message : 'working mate'})
-})
+
 async function connectDB() {
     try {
         await client.connect();
@@ -217,9 +215,7 @@ const SaveMSg = async (data) => {
       return false;
     }
   };
-  app.get('/',(req,res)=>{
-    res.send('Hello World!')
-  })
+
 const hashPassword = async (password) => {
     const saltRounds = 13; // Higher values are more secure but slower
     const salt = await bcrypt.genSalt(saltRounds);
@@ -1352,6 +1348,18 @@ const F = R.filter((item)=>item.hotDeals === true);
 res.json(F);
   }catch(err){
     res.json([err]);
+  }
+})
+app.get('/makepData',async(req,res)=>{
+  try{
+    const allProducts = [
+      ...(await db.collection(PRODUCTS_COLLECTION).find({Categorie: 'makeup&parfum'}).toArray()),
+      ...(await db.collection(PRODUCTS_COLLECTION).find({sous: 'parfum'}).toArray()),
+      ...(await db.collection(PRODUCTS_COLLECTION).find({sous: 'maquillage'}).toArray())
+    ];
+    res.json({message :allProducts});
+  }catch(err){
+    res.json({message : err});
   }
 })
 
