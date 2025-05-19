@@ -1207,21 +1207,23 @@ app.get('/ProductsPl2', async (req, res) => {
 app.get('/ProductsPl2014', async (req, res) => {
   const ITEMS_PER_PAGE = 100;
   try {
-    const page = parseInt(req.query.page) || 1;
+const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || ITEMS_PER_PAGE;
-    let id = req.query.id?.trim() || ""; // Trim whitespace
-if(id == 'cheveux'){
-  id = "cheveu"
-}
+    let searchTerm = req.query.id?.trim() || "";
+    if (searchTerm.toLowerCase() === 'cheveux') {
+      searchTerm = "cheveu";
+    }
+
     // Build MongoDB filter
-    const filter = id ? {
+  const filter = searchTerm ? {
       $or: [
-        { Categorie: { $regex: `^${id}$`, $options: 'i' } },
-        { sous: { $regex: `^${id}$`, $options: 'i' } },
-        { marques: { $regex: `^${id}$`, $options: 'i' } },
-          { name: { $regex: `^${id}$`, $options: 'i' } }
+        { Categorie: { $regex: searchTerm, $options: 'i' } },
+        { sous: { $regex: searchTerm, $options: 'i' } },
+        { marques: { $regex: searchTerm, $options: 'i' } },
+        { name: { $regex: searchTerm, $options: 'i' } }
       ]
     } : {};
+
 
     const skip = (page - 1) * limit;
 
