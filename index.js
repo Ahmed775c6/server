@@ -1218,7 +1218,8 @@ if(id == 'cheveux'){
       $or: [
         { Categorie: { $regex: `^${id}$`, $options: 'i' } },
         { sous: { $regex: `^${id}$`, $options: 'i' } },
-        { marques: { $regex: `^${id}$`, $options: 'i' } }
+        { marques: { $regex: `^${id}$`, $options: 'i' } },
+          { name: { $regex: `^${id}$`, $options: 'i' } }
       ]
     } : {};
 
