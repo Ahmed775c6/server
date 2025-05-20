@@ -14,7 +14,7 @@ const { emit, send, title, exit } = require('process');
 const { arrayBuffer } = require('stream/consumers');
 const  {SendVerifCode,SendBookigNotificationMail, ReplayToContact,SendAbonnement} = require('./send_mails'); 
 const {redis,createClient} = require('redis');
-const {getProductsCache,saveProductsInCache} = require('./redis')
+const {getProductsCache,saveProductsInCache , saveClientsCash,getClientsCash} = require('./redis')
 const  {  v4: uuidv4  } = require("uuid")  // Generate unique session IDs
 const server = require("http").createServer(app);
 const useragent = require("useragent");
@@ -820,6 +820,7 @@ const verificationToken = uuid.v4();
 
             const result = await collection.insertOne(newUser);
             await SendVerifCode(req.body.email,req.body.full_name,verificationCode,verificationToken);
+            await saveClientsCash();
             return res.json({ message: true , token : verificationToken});
         } else {
             return res.status(200).json({ message: false });
@@ -1337,9 +1338,9 @@ app.get("/me", authenticateToken, async (req, res) => {
 });
 app.get('/GetClients',async(req,res)=>{
     try{
-        console.log('getinng');
-const Fetch = await db.collection(USERS_COLLECTION).find().toArray();
-console.log(Fetch)
+     
+const Fetch = await getClientsCash();
+
  return res.json({message : Fetch});
     }catch(err){
         console.log('error getting clients from DB : ',err);
@@ -1922,6 +1923,7 @@ if(Fetch){
             isBanned : true
             }}
             )
+            await saveClientsCash();
 res.json({message : true})
         }else{
             res.json({message : 'user not found !'});
@@ -1941,6 +1943,7 @@ if(Fetch){
 const deleteResult = await collection.deleteOne(
     { _id: new ObjectId(Fetch._id) }
     )
+    await saveClientsCash()
     res.json({message :`User With ID ${Fetch._id} Deleted`});
 }else{
     res.json({message : 'User Not Found'});
@@ -1961,6 +1964,7 @@ const deleteResult = await collection.deleteOne(
                     isBanned : false
                     }}
                     )
+                    await saveClientsCash();
         res.json({message : true})}
     }catch(err){
         console.log('error unbanding user');
@@ -1979,7 +1983,7 @@ const deleteResult = await collection.deleteOne(
 
 
     const result = await db.collection(PRODUCTS_COLLECTION).updateMany(filter, update);
-  
+  await saveProductsInCache();
     res.json({
       message: 'Products updated successfully',
      
@@ -2098,6 +2102,7 @@ res.json({message : true})
   app.post('/Deleteproducts',async(req,res)=>{
     try{
 const collection =await db.collection(PRODUCTS_COLLECTION).deleteOne({_id : new ObjectId(req.body.id)});
+await saveProductsInCache();
 res.json({message : true});
     }catch(err){
         res.json({message : err});
@@ -2686,7 +2691,7 @@ const Note = await db.collection(NOTIFICATIONS_COLLECTION).insertOne({type : 're
   socket.on('verified-new', async(data)=>{
     try{
 const saving = await db.collection(NOTIFICATIONS_COLLECTION).insertOne(data);
-
+await saveClientsCash();
 socket.broadcast.emit('new-user', data)
     }catch(err){
       console.log(err);

@@ -5,7 +5,8 @@ const compression = require('compression');
 
 // Database configuration
 const dbName = process.env.DBNAME;
-const uri  = process.env.MONGO_URI; // Ensure this is in your .env
+const uri  = process.env.MONGO_URI;
+const USERS_COLLECTION = process.env.USERS_COLLECTION; // Ensure this is in your .env
 const client = new MongoClient(uri);
 let db = client.db(dbName);
 
@@ -60,6 +61,17 @@ const saveProductsInCache = async () => {
         return false;
     }
 }
+const saveClientsCash = async () => {
+    try {
+        const collection = db.collection(USERS_COLLECTION);
+        const result = await collection.find().toArray();
+        await redisClient.set('clients', JSON.stringify(result));
+        return true;
+    } catch (err) {
+        console.log('Error saving products to cache:', err);
+        return false;
+    }
+}
 
 
 // Get products from cache or database
@@ -84,8 +96,31 @@ const getProductsCache = async () => {
         throw err; // Rethrow to handle in calling function
     }
 }
+const getClientsCash = async()=>{
+       try {
+        const cachedProducts = await redisClient.get('clients');
+        
+        if (cachedProducts) {
+        
+            return JSON.parse(cachedProducts);
+        } else {
+        
+            // Fetch from database
+            const collection = db.collection(USERS_COLLECTION);
+            const products = await collection.find().toArray();
+            // Update cache
+            await redisClient.set('clients', JSON.stringify(products));
+            return products;
+        }
+    } catch (err) {
+        console.log('Error in cache access:', err);
+        throw err; // Rethrow to handle in calling function
+    }
+}
 
 module.exports = {
     saveProductsInCache,
+    saveClientsCash,
+    getClientsCash,
     getProductsCache
 };
