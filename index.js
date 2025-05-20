@@ -14,6 +14,7 @@ const { emit, send, title, exit } = require('process');
 const { arrayBuffer } = require('stream/consumers');
 const  {SendVerifCode,SendBookigNotificationMail, ReplayToContact,SendAbonnement} = require('./send_mails'); 
 const {redis,createClient} = require('redis');
+const {getProductsCache} = require('./redis')
 const  {  v4: uuidv4  } = require("uuid")  // Generate unique session IDs
 const server = require("http").createServer(app);
 const useragent = require("useragent");
@@ -69,18 +70,7 @@ const EXPENESS_COLLECTION = process.env.EXPENESS_COLLECTION
 const BRANDS = process.env.BRANDS;
 const uri  = process.env.MONGO_URI;
 
-/*const { ServerApiVersion } = require('mongodb');
-const uri = "mongodb+srv://ahmedchouikh2020:0oA8H5yrwmpgu4xw@cluster0.ybgdh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
-});
-*/
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
@@ -93,7 +83,7 @@ async function run() {
     await client.close();
   }
 }
-//run().catch(console.dir);
+
 const client = new MongoClient(uri);
 let db =client.db(dbName);
 
@@ -1316,7 +1306,7 @@ res.json({r});
 })
 app.get('/ProductsPl',async(req,res)=>{
   try{
-const Data = await db.collection(PRODUCTS_COLLECTION).find().toArray();
+const Data = await getProductsCache();;
 res.json(Data);
   }catch(err){
       console.log(err);
