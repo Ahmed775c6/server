@@ -8,7 +8,6 @@ const cors = require("cors");
 const uuid = require('uuid');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const compression = require('compression');
 const cookieParser = require('cookie-parser'); 
 const { emit, send, title, exit } = require('process');
 const { arrayBuffer } = require('stream/consumers');
@@ -23,11 +22,10 @@ const FRONT = process.env.FRONT_END_URL
 
 const io = require("socket.io")(server, {
   cors: {
-      origin: [
-          process.env.FRONT, 
-          'https://alltunisiapara.com',
-          'https://www.alltunisiapara.com'
-      ].filter(Boolean), // Removes any undefined/null values
+      origin: 
+         "http://localhost:5173", 
+  
+       // Removes any undefined/null values
       credentials: true,
       methods: ["GET", "POST"]
   }
@@ -35,18 +33,18 @@ const io = require("socket.io")(server, {
 
 // APP use
 app.use(cors({
-    origin:  [
-      process.env.FRONT, 
-      'https://alltunisiapara.com',
-      'https://www.alltunisiapara.com'
-  ].filter(Boolean), 
+    origin:  
+     'http://localhost:5173', 
+      
+   
+ 
     methods: ["GET", "POST"],        
     credentials: true         ,
     secure : process.env.NODE_ENV == "production"       
 }));
 app.use(cookieParser());
 // Load environment variables
-app.use(compression());
+
 const dbName = process.env.DBNAME;
 const USERS_COLLECTION = process.env.USERS_COLLECTION;
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
@@ -1205,18 +1203,6 @@ app.get('/ProductsPl2', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
-app.get('/names',async(req,res)=>{
-  try{
-const L = await db.collection(PRODUCTS_COLLECTION).find().toArray()
-const N = L.map((item)=>{return {name : item.name , id : item._id , mainImg : item.mainImage}})
-res.json( {message : N})    
-  }catch(err){
-    console.log('error fetching names', err)
-    res.json({error : err , message :  []})
-  }
-})
-
 app.get('/ProductsPl2014', async (req, res) => {
   const ITEMS_PER_PAGE = 100;
   try {
@@ -1262,6 +1248,16 @@ const page = parseInt(req.query.page) || 1;
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+app.get('/names',async(req,res)=>{
+  try{
+const L = await db.collection(PRODUCTS_COLLECTION).find().toArray()
+const N = L.map((item)=>{return {name : item.name , id : item._id , mainImg : item.mainImage}})
+res.json( {message : N})    
+  }catch(err){
+    console.log('error fetching names', err)
+    res.json({error : err , message :  []})
+  }
+})
 app.get('/getblog/:id',async(req,res)=>{
   try{
 const all = await db.collection(BLOGS_COLLECTION).find().toArray();
