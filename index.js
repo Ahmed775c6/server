@@ -1204,6 +1204,18 @@ app.get('/ProductsPl2', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+app.get('/names',async(req,res)=>{
+  try{
+const L = await db.collection(PRODUCTS_COLLECTION).find().toArray()
+const N = L.map((item)=>{return {name : item.name , id : item._id , mainImg : item.mainImage}})
+res.json( {message : N})    
+  }catch(err){
+    console.log('error fetching names', err)
+    res.json({error : err , message :  []})
+  }
+})
+
 app.get('/ProductsPl2014', async (req, res) => {
   const ITEMS_PER_PAGE = 100;
   try {
