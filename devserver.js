@@ -16,6 +16,8 @@ const {redis,createClient} = require('redis');
 const  {  v4: uuidv4  } = require("uuid")  // Generate unique session IDs
 const server = require("http").createServer(app);
 const useragent = require("useragent");
+const compression = require('compression');
+const {getProductsCache} = require('./redis')
 const { link } = require('fs');
 const { subscribe } = require('diagnostics_channel');
 const FRONT = process.env.FRONT_END_URL
@@ -44,7 +46,7 @@ app.use(cors({
 }));
 app.use(cookieParser());
 // Load environment variables
-
+app.use(compression());
 const dbName = process.env.DBNAME;
 const USERS_COLLECTION = process.env.USERS_COLLECTION;
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
@@ -109,8 +111,7 @@ const U = process.env.REDIS_URL
 
 connectDB();
 
-//const redis_client = redis.createClient();
-//redis_client.connect().catch(console.error);
+
 
 
 
@@ -1312,7 +1313,7 @@ res.json({r});
 })
 app.get('/ProductsPl',async(req,res)=>{
   try{
-const Data = await db.collection(PRODUCTS_COLLECTION).find().toArray();
+const Data = await getProductsCache();
 res.json(Data);
   }catch(err){
       console.log(err);

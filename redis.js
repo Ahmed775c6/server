@@ -61,16 +61,17 @@ const saveProductsInCache = async () => {
     }
 }
 
+
 // Get products from cache or database
 const getProductsCache = async () => {
     try {
         const cachedProducts = await redisClient.get('products');
         
         if (cachedProducts) {
-            console.log('Cache hit');
+        
             return JSON.parse(cachedProducts);
         } else {
-            console.log('Cache miss');
+        
             // Fetch from database
             const collection = db.collection(PRODUCTS_COLLECTION);
             const products = await collection.find().toArray();
@@ -85,5 +86,6 @@ const getProductsCache = async () => {
 }
 
 module.exports = {
+    saveProductsInCache,
     getProductsCache
 };

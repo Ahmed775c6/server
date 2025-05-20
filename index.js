@@ -14,7 +14,7 @@ const { emit, send, title, exit } = require('process');
 const { arrayBuffer } = require('stream/consumers');
 const  {SendVerifCode,SendBookigNotificationMail, ReplayToContact,SendAbonnement} = require('./send_mails'); 
 const {redis,createClient} = require('redis');
-const {getProductsCache} = require('./redis')
+const {getProductsCache,saveProductsInCache} = require('./redis')
 const  {  v4: uuidv4  } = require("uuid")  // Generate unique session IDs
 const server = require("http").createServer(app);
 const useragent = require("useragent");
@@ -2112,7 +2112,7 @@ const data = req.body;
 data.status = true;
 data.reviews = [];
 const addResult = await collection.insertOne(data);
-
+await saveProductsInCache();
 
 
 res.status(201).json({
