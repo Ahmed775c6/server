@@ -1379,6 +1379,7 @@ res.json(F);
 app.get('/makepData',async(req,res)=>{
   try{
     const allProducts = Getmakeups();
+    console.log(allProducts)
     res.json({message :allProducts});
   }catch(err){
     res.json({message : err});
