@@ -14,7 +14,7 @@ const { emit, send, title, exit } = require('process');
 const { arrayBuffer } = require('stream/consumers');
 const  {SendVerifCode,SendBookigNotificationMail, ReplayToContact,SendAbonnement} = require('./send_mails'); 
 const {redis,createClient} = require('redis');
-const {getProductsCache,saveProductsInCache , saveClientsCash,getClientsCash} = require('./redis')
+const {getProductsCache,saveProductsInCache ,getSpecifyProducts, saveClientsCash,getClientsCash} = require('./redis')
 const  {  v4: uuidv4  } = require("uuid")  // Generate unique session IDs
 const server = require("http").createServer(app);
 const useragent = require("useragent");
@@ -985,7 +985,15 @@ app.get('/legals101',async(req,res)=>{
     res.json({message : false , dt : [{g : 'X' , p : '0'}]})
   }
 })
-
+app.get('/gymPR',async(req,res)=>{
+  try{
+const result = await getSpecifyProducts('nutrition Sprotive')
+res.json({message : result})
+  }catch(err){
+    console.log(err)
+    res.json({message : [], error : err})
+  }
+})
 app.get('/Analyse',async(req,res)=>{
   try{
 
@@ -1216,6 +1224,9 @@ const page = parseInt(req.query.page) || 1;
     let searchTerm = req.query.id?.trim() || "";
     if (searchTerm.toLowerCase() === 'cheveux') {
       searchTerm = "cheveu";
+    }
+   if (searchTerm.toLowerCase() === 'Solaires') {
+      searchTerm = "solaire";
     }
 
     // Build MongoDB filter
@@ -1488,6 +1499,15 @@ res.json({message : item})
   }catch(err){
     console.log(err)
     res.json({message : {}})
+  }
+})
+app.get('/AnimPR',async(req,res)=>{
+  try{
+const result = await getSpecifyProducts('animals');
+res.json({message : result})
+  }catch(err){
+    console.log(err)
+    res.json({message : [] , err : []})
   }
 })
 // Refresh Token Route

@@ -118,7 +118,29 @@ const getClientsCash = async()=>{
     }
 }
 
+const getSpecifyProducts = async(categorie)=>{
+  try {
+        const cachedProducts = await redisClient.get(`p_${categorie}`);
+        
+        if (cachedProducts) {
+        
+            return JSON.parse(cachedProducts);
+        } else {
+        
+            // Fetch from database
+            const collection = db.collection(PRODUCTS_COLLECTION);
+            const products = await collection.find({Categorie : categorie}).toArray();
+            // Update cache
+            await redisClient.set(`p_${categorie}`, JSON.stringify(products));
+            return products;
+        }
+    } catch (err) {
+        console.log('Error in cache access:', err);
+        throw err; // Rethrow to handle in calling function
+    }
+}
 module.exports = {
+    getSpecifyProducts,
     saveProductsInCache,
     saveClientsCash,
     getClientsCash,
