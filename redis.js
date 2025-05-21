@@ -139,7 +139,33 @@ const getSpecifyProducts = async(categorie)=>{
         throw err; // Rethrow to handle in calling function
     }
 }
+const Getmakeups = async()=>{
+  try {
+        const cachedProducts = await redisClient.get(`p_Makeup`);
+        
+        if (cachedProducts) {
+        
+            return JSON.parse(cachedProducts);
+        } else {
+        
+            // Fetch from database
+            const collection = db.collection(PRODUCTS_COLLECTION);
+            const products = [
+      ...(await db.collection(PRODUCTS_COLLECTION).find({Categorie: 'makeup&parfum'}).toArray()),
+      ...(await db.collection(PRODUCTS_COLLECTION).find({sous: 'parfum'}).toArray()),
+      ...(await db.collection(PRODUCTS_COLLECTION).find({sous: 'maquillage'}).toArray())
+    ];
+            // Update cache
+            await redisClient.set(`p_Makeup`, JSON.stringify(products));
+            return products;
+        }
+    } catch (err) {
+        console.log('Error in cache access:', err);
+        throw err; // Rethrow to handle in calling function
+    }
+}
 module.exports = {
+    Getmakeups,
     getSpecifyProducts,
     saveProductsInCache,
     saveClientsCash,

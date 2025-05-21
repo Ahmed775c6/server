@@ -14,7 +14,7 @@ const { emit, send, title, exit } = require('process');
 const { arrayBuffer } = require('stream/consumers');
 const  {SendVerifCode,SendBookigNotificationMail, ReplayToContact,SendAbonnement} = require('./send_mails'); 
 const {redis,createClient} = require('redis');
-const {getProductsCache,saveProductsInCache ,getSpecifyProducts, saveClientsCash,getClientsCash} = require('./redis')
+const {getProductsCache,saveProductsInCache ,Getmakeups  ,getSpecifyProducts, saveClientsCash,getClientsCash} = require('./redis')
 const  {  v4: uuidv4  } = require("uuid")  // Generate unique session IDs
 const server = require("http").createServer(app);
 const useragent = require("useragent");
@@ -1378,11 +1378,7 @@ res.json(F);
 })
 app.get('/makepData',async(req,res)=>{
   try{
-    const allProducts = [
-      ...(await db.collection(PRODUCTS_COLLECTION).find({Categorie: 'makeup&parfum'}).toArray()),
-      ...(await db.collection(PRODUCTS_COLLECTION).find({sous: 'parfum'}).toArray()),
-      ...(await db.collection(PRODUCTS_COLLECTION).find({sous: 'maquillage'}).toArray())
-    ];
+    const allProducts = Getmakeups();
     res.json({message :allProducts});
   }catch(err){
     res.json({message : err});
