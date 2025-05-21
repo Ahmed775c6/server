@@ -1378,7 +1378,7 @@ res.json(F);
 })
 app.get('/makepData',async(req,res)=>{
   try{
-    const allProducts = Getmakeups();
+    const allProducts = await Getmakeups();
     console.log(allProducts)
     res.json({message :allProducts});
   }catch(err){
