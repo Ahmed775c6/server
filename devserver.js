@@ -116,12 +116,7 @@ connectDB();
 
 
 const redis_client = createClient({
-    username: 'default',
-    password: process.env.REDIS_PASS,
-    socket: {
-        host: process.env.REDIS_URL,
-        port: 16921
-    }
+   
 });
 
   // >>> bar
@@ -887,21 +882,24 @@ res.json({message : true})
 
 app.post("/admin_login", async (req, res) => {
   const { email, password, code } = req.body;
-
+console.log('Admin login attempt for email:', email , password, code);
   try {
     // Find the admin user by email
 
     const admin = await db.collection(ADMIN_COLLECTION).findOne({ email });
-
+console.log('admin' , admin)
     if (!admin || !(await bcrypt.compare(password, admin.password))) {
+      console.log('Invalid admin password for email:', email);
       return res.status(400).json({ error: "Invalid credentials" });
     }
 
     if (admin.role !== "admin") {
+      console.log('Unauthorized access attempt for email:', email);
       return res.status(403).json({ error: "Unauthorized access" });
     }
 
     if (!(await bcrypt.compare(code, admin.pinCodeHash))) {
+      console.log('Invalid pin code attempt for email:', email);
       return res.status(400).json({ error: "Invalid pin code" });
     }
 
